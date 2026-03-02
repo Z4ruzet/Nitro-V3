@@ -65,7 +65,7 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = props =
             </div>
             <div className="flex flex-col justify-between col-span-5 overflow-auto">
                 <div className="flex flex-col gap-2 overflow-hidden">
-                    <span className="text-sm truncate grow">{ LocalizeText('inventory.badges.activebadges') }</span>
+                    <span className="text-sm truncate min-h-[1.25rem] leading-5">{ LocalizeText('inventory.badges.activebadges') }</span>
                     <InfiniteGrid<string>
                         columnCount={ 3 }
                         estimateSize={ 50 }
