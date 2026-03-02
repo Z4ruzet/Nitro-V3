@@ -24,7 +24,8 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = props => 
     const [ effectsThumbnails, setEffectsThumbnails ] = useState<CameraPictureThumbnail[]>([]);
     const [ isZoomed, setIsZoomed ] = useState(false);
     const [ currentPictureUrl, setCurrentPictureUrl ] = useState<string>('');
-    const isBusy = useRef<boolean>(false);
+    const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+    const requestIdRef = useRef<number>(0);
 
     const getColorMatrixEffects = useMemo(() => {
         return availableEffects.filter(effect => effect.colorMatrix);
@@ -134,15 +135,24 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = props => 
     }, [ picture, availableEffects ]);
 
     useEffect(() => {
-        GetRoomCameraWidgetManager()
-            .applyEffects(picture.texture, selectedEffects, false) // Remove isZoomed from here
-            .then(imageElement => {
-                setCurrentPictureUrl(imageElement.src);
-            })
-            .catch(error => {
-                NitroLogger.error('Failed to apply effects to picture', error);
-            });
-    }, [ picture, selectedEffects ]); // Remove isZoomed from dependency array
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+        debounceTimerRef.current = setTimeout(() => {
+            const id = ++requestIdRef.current;
+
+            GetRoomCameraWidgetManager()
+                .applyEffects(picture.texture, selectedEffects, false)
+                .then(imageElement => {
+                    if (id !== requestIdRef.current) return;
+                    setCurrentPictureUrl(imageElement.src);
+                })
+                .catch(error => NitroLogger.error('Failed to apply effects to picture', error));
+        }, 50);
+
+        return () => {
+            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+        };
+    }, [ picture, selectedEffects ]);
 
     return (
         <NitroCardView className="w-[600px] h-[500px]">
@@ -182,10 +192,10 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = props => 
                                     <Text>{ LocalizeText('camera.effect.name.' + selectedEffectName) }</Text>
                                     <Slider
                                         min={ 0 }
-                                        max={ 1 }
-                                        step={ 0.01 }
-                                        value={ getCurrentEffect.strength }
-                                        onChange={ event => setSelectedEffectAlpha(event) }
+                                        max={ 100 }
+                                        step={ 1 }
+                                        value={ Math.round(getCurrentEffect.strength * 100) }
+                                        onChange={ event => setSelectedEffectAlpha(event / 100) }
                                         renderThumb={ ({ key, ...props }, state) => <div key={ key } { ...props }>{ state.valueNow }</div> }
                                     />
                                 </Column>
