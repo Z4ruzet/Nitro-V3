@@ -1,4 +1,4 @@
-# v2.2.0 - Cool UI Beta !! Use at Own Risk as it is still in Beta !!
+# v2.2.0 -Nitro V3 !! Use at Own Risk as it is still in Beta !!
 
 ## Prerequisites
 
