@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { GetConfigurationValue } from '../../api';
 import { RoomWidgetView } from './RoomWidgetView';
 
@@ -58,17 +58,17 @@ export const HotelView: FC<{}> = props =>
 
     const timezone = GetConfigurationValue<string>('timezone.settings', '');
 
-/**
     const timeOfDay = useMemo(() =>
     {
         const hour = getHourInTimezone(timezone);
 
         return getTimeOfDay(hour);
     }, [ timezone ]);
+	
+	/**
+	const timeOfDay = 'sunset';
+	For debuging the diff views
 	*/
-
-	const timeOfDay = 'night';
-
 
     const skyColor = SKY_COLORS[timeOfDay] ?? configBgColor ?? '#000';
 
