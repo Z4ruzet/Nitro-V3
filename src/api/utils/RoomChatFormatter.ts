@@ -1,5 +1,6 @@
 import { GetConfigurationValue } from '../nitro/GetConfigurationValue';
 import { LocalizeText } from './LocalizeText';
+import * as joypixels from 'emoji-toolkit';
 
 const allowedColours: Map<string, string> = new Map();
 
@@ -45,7 +46,7 @@ export const RoomChatFormatter = (content: string) =>
     let result = '';
 
     content = encodeHTML(content);
-    //content = (joypixels.shortnameToUnicode(content) as string)
+    content = (joypixels.shortnameToUnicode(content) as string)
 
     if(!GetConfigurationValue<boolean>('youtube.publish.disabled', false))
     {
